@@ -224,13 +224,15 @@
         <h3>🔑 Captain & Teacher Inbox</h3>
         <p style="color: #8892b0; text-align: center; font-size: 14px; margin-top: -10px; margin-bottom: 20px;">Universal Live Database (Syncs automatically across all devices).</p>
         <div class="chat-box" id="adminChatBox">
-            <p id="noMsgs" class="status-text">Loading incoming entries from database...</p>
+            <p id="noMsgs" class="status-text">Loading incoming entries from cloud...</p>
         </div>
     </div>
 
     <script>
-        // Form ID from your setup
+        // Form ID for backup emails
         const FORMSPARK_FORM_ID = "G1W26HQC7nYRAYnZXF1ALmYb"; 
+        // Free cloud storage key unique to your school campaign 
+        const CLOUD_DATABASE_URL = "https://kvdb.io/MNZ7rG87aC6i6XW3A57R1B/poseidon_history_v2";
 
         const form = document.getElementById('complaintForm');
         const adminChatBox = document.getElementById('adminChatBox');
@@ -246,86 +248,10 @@
             const now = new Date();
             const timestamp = now.toLocaleDateString() + ' @ ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
+            const payload = { grade, category, messageText, timestamp };
+
+            // 1. Send to Formspark for automatic email logs
             fetch(`https://submit-form.com/${FORMSPARK_FORM_ID}`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Accept: "application/json",
-                },
-                body: JSON.stringify({
-                    Grade: grade,
-                    Type: category,
-                    Message: messageText,
-                    SentAt: timestamp
-                }),
-            })
-            .then(() => {
-                form.reset();
-                alert("Success! Message sent to the database cloud.");
-                // If dashboard is open, reload messages instantly
-                if (!document.getElementById('adminContainer').classList.contains('hidden')) {
-                    fetchUniversalMessages();
-                }
-            })
-            .catch((error) => {
-                console.error("Error sending message:", error);
-                alert("Network error. Please try again.");
-            });
-        });
-
-        function renderMessage(data) {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = 'message';
-            msgDiv.innerHTML = `
-                <div class="tag-row">
-                    <div class="tag-group">
-                        <span class="tag">${data.Grade || 'Unknown'}</span>
-                        <span class="tag type-tag">${data.Type || 'Submission'}</span>
-                    </div>
-                    <span class="time-stamp">${data.SentAt || ''}</span>
-                </div>
-                <p class="msg-text">"${data.Message || ''}"</p>
-            `;
-            adminChatBox.appendChild(msgDiv);
-        }
-
-        // Pulls all messages straight from Formspark API instantly on any device!
-        function fetchUniversalMessages() {
-            adminChatBox.innerHTML = '<p class="status-text">Fetching data cards from cloud...</p>';
-            
-            fetch(`https://api.formspark.io/v1/forms/${FORMSPARK_FORM_ID}/submissions`)
-            .then(response => {
-                if (!response.ok) throw new Error("API Limit or Auth block");
-                return response.json();
-            })
-            .then(data => {
-                adminChatBox.innerHTML = '';
-                if (data.length === 0) {
-                    adminChatBox.innerHTML = '<p class="status-text">No data cards available in cloud database.</p>';
-                    return;
-                }
-                // Loop through and display all messages sent from all devices
-                data.forEach(submission => {
-                    renderMessage(submission.data);
-                });
-            })
-            .catch(error => {
-                console.error("Database connection:", error);
-                adminChatBox.innerHTML = '<p class="status-text" style="color:#ef4444;">Please check your Formspark dashboard dashboard under submissions directly.</p>';
-            });
-        }
-
-        function loginAdmin() {
-            const password = prompt("Enter the Poseidon Passcode:");
-            if (password === "poseidon2026") {
-                document.getElementById('adminContainer').classList.remove('hidden');
-                fetchUniversalMessages();
-                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-            } else {
-                alert("Incorrect passcode. Access denied.");
-            }
-        }
-    </script>
-
-</body>
-</html>
+                headers: { "Content-Type": "application/json", Accept: "application/json" },
+                body: JSON.stringify({ Grade: grade, Type:
