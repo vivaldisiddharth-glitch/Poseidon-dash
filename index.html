@@ -222,7 +222,7 @@
 
     <div id="adminContainer" class="container admin-panel hidden">
         <h3>🔑 Captain & Teacher Inbox</h3>
-        <p style="color: #8892b0; text-align: center; font-size: 14px; margin-top: -10px; margin-bottom: 20px;">Universal Live Engine (Syncs variables across all separate user devices).</p>
+        <p style="color: #8892b0; text-align: center; font-size: 14px; margin-top: -10px; margin-bottom: 20px;">Universal Live Engine (Syncs automatically across all separate mobile/desktop devices).</p>
         <div class="chat-box" id="adminChatBox">
             <p id="noMsgs" class="status-text">No entries loaded yet.</p>
         </div>
@@ -231,8 +231,8 @@
     <script>
         const FORMSPARK_FORM_ID = "G1W26HQC7nYRAYnZXF1ALmYb"; 
         
-        // Fully public decentralized synchronization tunnel
-        const SYNC_URL = "https://kvdb.io/MNZ7rG87aC6i6XW3A57R1B/poseidon_dashboard_v4";
+        // Brand new dedicated public tunnel matrix endpoint
+        const SYNC_URL = "https://kvdb.io/A9zW7V45bX1y2Z3K4L5M6N/poseidon_school_hq_v5";
 
         const form = document.getElementById('complaintForm');
         const adminChatBox = document.getElementById('adminChatBox');
@@ -249,27 +249,31 @@
 
             const payload = { grade, category, messageText, timestamp };
 
-            // 1. Send immediate email tracking data to Formspark
+            // 1. Send backup trace data to Formspark
             fetch(`https://submit-form.com/${FORMSPARK_FORM_ID}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", Accept: "application/json" },
                 body: JSON.stringify({ Grade: grade, Type: category, Message: messageText, SentAt: timestamp }),
             });
 
-            // 2. Direct clean background write (won't freeze buttons even if network breaks)
+            // 2. Fetch array, safely handle data types, and push back up to cloud
             fetch(SYNC_URL)
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) throw new Error();
+                return res.json();
+            })
             .then(currentData => {
                 let updated = Array.isArray(currentData) ? currentData : [];
                 updated.push(payload);
                 return fetch(SYNC_URL, { method: "POST", body: JSON.stringify(updated) });
             })
             .catch(() => {
+                // If endpoint is blank/fresh, seed initial array entry 
                 return fetch(SYNC_URL, { method: "POST", body: JSON.stringify([payload]) });
             })
             .then(() => {
                 form.reset();
-                alert("Success! Message sent to the dashboard.");
+                alert("Success! Message synced universally.");
                 if (!document.getElementById('adminContainer').classList.contains('hidden')) {
                     fetchUniversalMessages();
                 }
@@ -279,9 +283,10 @@
         function renderAllMessages(arr) {
             adminChatBox.innerHTML = '';
             if (!arr || arr.length === 0) {
-                adminChatBox.innerHTML = '<p class="status-text">No submissions found in cloud database.</p>';
+                adminChatBox.innerHTML = '<p class="status-text">No submissions found in cloud server.</p>';
                 return;
             }
+            // Sort to make newest cards appear first
             const reversed = [...arr].reverse();
             reversed.forEach(msg => {
                 const msgDiv = document.createElement('div');
@@ -290,7 +295,7 @@
                     <div class="tag-row">
                         <div class="tag-group">
                             <span class="tag">${msg.grade || 'General'}</span>
-                            <span class="tag type-tag">${msg.category || 'Submission'}</span>
+                            <span class="tag type-tag">${msg.category || 'Feedback'}</span>
                         </div>
                         <span class="time-stamp">${msg.timestamp || ''}</span>
                     </div>
@@ -301,7 +306,7 @@
         }
 
         function fetchUniversalMessages() {
-            adminChatBox.innerHTML = '<p class="status-text">Loading live history from cloud network...</p>';
+            adminChatBox.innerHTML = '<p class="status-text">Connecting to cloud network data loop...</p>';
             
             fetch(SYNC_URL)
             .then(res => res.json())
@@ -309,7 +314,7 @@
                 renderAllMessages(messages);
             })
             .catch(() => {
-                adminChatBox.innerHTML = '<p class="status-text">No active messages recorded yet.</p>';
+                adminChatBox.innerHTML = '<p class="status-text">No active messages recorded on the sync grid yet.</p>';
             });
         }
 
