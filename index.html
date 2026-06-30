@@ -6,108 +6,168 @@
     <title>Poseidon House Dashboard</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            color: #fff;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: radial-gradient(circle at center, #0a192f 0%, #020c1b 100%);
+            color: #e2e8f0;
             margin: 0;
             padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
         }
         .container {
-            max-width: 600px;
+            max-width: 650px;
             width: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            margin-bottom: 20px;
+            background: rgba(10, 25, 47, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 229, 255, 0.1);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            margin-bottom: 25px;
             box-sizing: border-box;
+            transition: all 0.3s ease;
         }
-        h1, h2, h3 {
+        .container:hover {
+            border-color: rgba(0, 229, 255, 0.4);
+            box-shadow: 0 10px 40px rgba(0, 229, 255, 0.15);
+        }
+        h1 {
             text-align: center;
-            color: #4fc3f7;
+            color: #00e5ff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-top: 0;
+            font-size: 28px;
+            text-shadow: 0 0 15px rgba(0, 229, 255, 0.6);
+        }
+        h2, h3 {
+            text-align: center;
+            color: #00e5ff;
             text-transform: uppercase;
             letter-spacing: 2px;
         }
+        p.subtitle {
+            text-align: center;
+            color: #8892b0;
+            font-size: 15px;
+            margin-bottom: 25px;
+        }
         label {
             display: block;
-            margin: 10px 0 5px;
-            font-weight: bold;
+            margin: 15px 0 8px;
+            font-weight: 600;
+            color: #64ffda;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         input, select, textarea {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            border: none;
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            background: rgba(2, 12, 27, 0.6);
+            color: #f8fafc;
             box-sizing: border-box;
-            font-size: 14px;
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #00e5ff;
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+            background: rgba(2, 12, 27, 0.8);
         }
         select option {
-            background: #203a43;
+            background: #0a192f;
             color: #fff;
         }
         button {
             width: 100%;
-            padding: 12px;
-            background: #00e5ff;
+            padding: 14px;
+            background: linear-gradient(90deg, #00b8d4, #00e5ff);
             border: none;
-            color: #0f2027;
+            color: #020c1b;
             font-weight: bold;
             font-size: 16px;
-            border-radius: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(0, 229, 255, 0.2);
         }
         button:hover {
-            background: #00b8d4;
-            box-shadow: 0 0 15px #00e5ff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 229, 255, 0.4);
         }
         .admin-btn {
-            background: #ffb300;
-            margin-top: 10px;
+            background: transparent;
+            border: 1px solid #ffb300;
+            color: #ffb300;
+            margin-top: 15px;
+            box-shadow: none;
         }
         .admin-btn:hover {
-            background: #ffa000;
-            box-shadow: 0 0 15px #ffb300;
+            background: rgba(255, 179, 0, 0.1);
+            box-shadow: 0 0 15px rgba(255, 179, 0, 0.2);
+            color: #ffb300;
         }
         .chat-box {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 10px;
-            max-height: 400px;
+            background: rgba(2, 12, 27, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            max-height: 450px;
             overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
         .message {
             border-left: 4px solid #00e5ff;
-            padding-left: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 15px;
+            border-radius: 0 10px 10px 0;
             margin-bottom: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 10px;
-            border-radius: 0 5px 5px 0;
+            animation: fadeIn 0.4s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: opacity: 1; transform: translateY(0); }
+        }
+        .tag-row {
+            margin-bottom: 8px;
         }
         .tag {
-            font-size: 12px;
-            background: #2c5364;
-            padding: 2px 6px;
-            border-radius: 3px;
-            color: #4fc3f7;
-            margin-right: 5px;
-            display: inline-block;
-            margin-top: 5px;
+            font-size: 11px;
+            background: rgba(0, 229, 255, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: #00e5ff;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-right: 6px;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+        }
+        .tag.type-tag {
+            background: rgba(100, 255, 218, 0.1);
+            color: #64ffda;
+            border-color: rgba(100, 255, 218, 0.2);
         }
         .hidden {
             display: none;
         }
         .admin-panel {
-            border: 2px solid #ffb300;
-            background: rgba(255, 179, 0, 0.05);
+            border: 1px solid #ffb300;
+            box-shadow: 0 10px 40px rgba(255, 179, 0, 0.05);
+        }
+        .msg-text {
+            margin: 5px 0 0 0;
+            color: #ccd6f6;
+            line-height: 1.5;
         }
     </style>
 </head>
@@ -115,10 +175,10 @@
 
     <div class="container">
         <h1>🔱 Poseidon Dashboard 🔱</h1>
-        <p style="text-align: center;">Submit complaints or ideas straight to the Council & Teachers.</p>
+        <p class="subtitle">Submit complaints or ideas straight to the Council & Teachers.</p>
         
         <form id="complaintForm">
-            <label for="grade">Your Grade:</label>
+            <label for="grade">Your Grade</label>
             <select id="grade" required>
                 <option value="6th Grade">6th Grade</option>
                 <option value="7th Grade">7th Grade</option>
@@ -129,15 +189,15 @@
                 <option value="12th Grade">12th Grade</option>
             </select>
 
-            <label for="category">Type:</label>
+            <label for="category">Submission Type</label>
             <select id="category" required>
                 <option value="Complaint">Complaint</option>
                 <option value="Request Help">Request Help</option>
                 <option value="Event Idea">Event Idea</option>
             </select>
 
-            <label for="message">Your Message:</label>
-            <textarea id="message" rows="3" placeholder="Type here..." required></textarea>
+            <label for="message">Your Message</label>
+            <textarea id="message" rows="3" placeholder="Drop your honest feedback or ideas here..." required></textarea>
 
             <button type="submit">Submit to Dashboard</button>
         </form>
@@ -146,11 +206,12 @@
     </div>
 
     <div id="adminContainer" class="container admin-panel hidden">
-        <h3>🔑 Captain & Teacher Inbox</h3>
-        <p style="color: #ffb300; text-align: center; font-size: 14px; margin-top: -10px;">Showing all submitted messages on this session.</p>
+        <h3 style="color: #ffb300; text-shadow: 0 0 10px rgba(255, 179, 0, 0.4);">🔑 Captain & Teacher Inbox</h3>
+        <p style="color: #8892b0; text-align: center; font-size: 14px; margin-top: -10px; margin-bottom: 20px;">Saved History Dashboard (All messages remain saved on this browser).</p>
         <div class="chat-box" id="adminChatBox">
-            <p id="noMsgs" style="text-align: center; color: #aaa;">No messages loaded in this view yet.</p>
+            <p id="noMsgs" style="text-align: center; color: #8892b0;">No messages received yet.</p>
         </div>
+        <button onclick="clearMessages()" style="background: transparent; border: 1px solid #ef4444; color: #ef4444; font-size: 12px; padding: 6px; width: auto; margin: 15px auto 0 auto; display: block; box-shadow: none;">Clear Inbox Data</button>
     </div>
 
     <script>
@@ -160,6 +221,9 @@
         const form = document.getElementById('complaintForm');
         const adminChatBox = document.getElementById('adminChatBox');
         const noMsgsText = document.getElementById('noMsgs');
+
+        // Load saved messages from LocalStorage when the page loads
+        document.addEventListener("DOMContentLoaded", loadMessages);
 
         form.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -182,26 +246,55 @@
                 }),
             })
             .then(() => {
-                // 2. Add it live to the dashboard inbox on the screen straight away
-                if (noMsgsText) noMsgsText.style.display = 'none';
-
-                const msgDiv = document.createElement('div');
-                msgDiv.className = 'message';
-                msgDiv.innerHTML = `
-                    <strong>New Submission:</strong> <br>
-                    <span class="tag">${grade}</span><span class="tag" style="color:#ffb300;">${category}</span>
-                    <p style="margin-top: 8px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 4px; border-left: 2px solid #ffb300;">"${messageText}"</p>
-                `;
-                adminChatBox.insertBefore(msgDiv, adminChatBox.firstChild);
+                // Save locally so it doesn't vanish on refresh
+                const newMsg = { grade, category, messageText };
+                saveMessageToLocalStorage(newMsg);
+                
+                // Add to visual view immediately
+                renderMessage(newMsg);
 
                 form.reset();
-                alert("Success! Your entry has been sent to Formspark and added directly to the Poseidon Dashboard.");
+                alert("Success! Sent directly to the Poseidon Dashboard.");
             })
             .catch((error) => {
                 console.error("Error sending message:", error);
-                alert("Something went wrong. Please check your network connection.");
+                alert("Network error. Please try again.");
             });
         });
+
+        function renderMessage(msg) {
+            if (noMsgsText) noMsgsText.style.display = 'none';
+
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message';
+            msgDiv.innerHTML = `
+                <div class="tag-row">
+                    <span class="tag">${msg.grade}</span>
+                    <span class="tag type-tag">${msg.category}</span>
+                </div>
+                <p class="msg-text">"${msg.messageText}"</p>
+            `;
+            adminChatBox.insertBefore(msgDiv, adminChatBox.firstChild);
+        }
+
+        function saveMessageToLocalStorage(msg) {
+            let messages = localStorage.getItem('poseidon_messages') ? JSON.parse(localStorage.getItem('poseidon_messages')) : [];
+            messages.push(msg);
+            localStorage.setItem('poseidon_messages', JSON.stringify(messages));
+        }
+
+        function loadMessages() {
+            let messages = localStorage.getItem('poseidon_messages') ? JSON.parse(localStorage.getItem('poseidon_messages')) : [];
+            if (messages.length > 0 && noMsgsText) noMsgsText.style.display = 'none';
+            messages.forEach(msg => renderMessage(msg));
+        }
+
+        function clearMessages() {
+            if (confirm("Are you sure you want to wipe all stored messages from this browser session?")) {
+                localStorage.removeItem('poseidon_messages');
+                location.reload();
+            }
+        }
 
         function loginAdmin() {
             const password = prompt("Enter the Poseidon Passcode:");
