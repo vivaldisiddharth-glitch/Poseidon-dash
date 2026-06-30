@@ -251,17 +251,20 @@
                 method: "POST",
                 headers: { "Content-Type": "application/json", Accept: "application/json" },
                 body: JSON.stringify({ Grade: grade, Type: category, Message: messageText, SentAt: timestamp }),
-            });
+            }).catch(e => console.log("Formspark backup skipped"));
 
-            // npoint Read -> Append -> Update Cycle
+            // Read -> Append -> Update via PUT (npoint default method)
             fetch(NPOINT_URL)
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) throw new Error("Network response error");
+                return res.json();
+            })
             .then(currentData => {
                 let updated = Array.isArray(currentData) ? currentData : [];
                 updated.push(payload);
 
                 return fetch(NPOINT_URL, {
-                    method: "POST",
+                    method: "PUT",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(updated)
                 });
@@ -274,8 +277,8 @@
                 }
             })
             .catch(err => {
-                console.error(err);
-                alert("Database sync issue.");
+                console.error("Sync Error:", err);
+                alert("Database sync issue. Make sure your npoint bin has [] saved inside it!");
             });
         });
 
@@ -311,7 +314,8 @@
             .then(messages => {
                 renderAllMessages(messages);
             })
-            .catch(() => {
+            .catch((err) => {
+                console.error("Fetch Error:", err);
                 adminChatBox.innerHTML = '<p class="status-text">No active messages recorded on the sync grid yet.</p>';
             });
         }
@@ -327,6 +331,5 @@
             }
         }
     </script>
-
 </body>
 </html>
