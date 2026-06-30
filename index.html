@@ -229,8 +229,12 @@
     </div>
 
     <script>
-        // Generated fresh deployment key specifically to handle 404 bypasses
-        const SYNC_URL = "https://api.npoint.io/46df7bb2c7bdf667500f";
+      <script>
+        // Completely public, cross-origin allowed data channel
+        const SYNC_URL = "https://api.jsonbin.io/v3/b/66810a9facd3cb34a8601831/latest";
+        const UPDATE_URL = "https://api.jsonbin.io/v3/b/66810a9facd3cb34a8601831";
+        // Access key specifically configured for this public school box
+        const BIN_KEY = "$2a$10$7R9MhPZ7z1e.tF7QeHnSFe8K8kYpREj9iRbyK9.p2Efe16iJ7a5m2";
 
         const form = document.getElementById('complaintForm');
         const adminChatBox = document.getElementById('adminChatBox');
@@ -246,20 +250,24 @@
             const timestamp = now.toLocaleDateString() + ' @ ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             const payload = { grade, category, messageText, timestamp };
 
-            // Read list -> Add new -> Overwrite list (safely catching 404s)
-            fetch(SYNC_URL)
-            .then(res => {
-                if (!res.ok) return []; // If 404, start with a fresh blank array
-                return res.json().catch(() => []);
+            // 1. Fetch current array
+            fetch(SYNC_URL, {
+                headers: { "X-Master-Key": BIN_KEY }
             })
-            .then(currentData => {
-                let updated = Array.isArray(currentData) ? currentData : [];
-                updated.push(payload);
+            .then(res => res.json())
+            .then(data => {
+                // JSONBin wraps data inside a .record property
+                let currentMessages = data.record && Array.isArray(data.record) ? data.record : [];
+                currentMessages.push(payload);
 
-                return fetch(SYNC_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(updated)
+                // 2. Put updated array back
+                return fetch(UPDATE_URL, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Master-Key": BIN_KEY
+                    },
+                    body: JSON.stringify(currentMessages)
                 });
             })
             .then(() => {
@@ -270,8 +278,8 @@
                 }
             })
             .catch(err => {
-                console.error("Global Sync Error:", err);
-                alert("Synced successfully!");
+                console.error("Sync Error:", err);
+                alert("Connection glitch. Hit submit again!");
             });
         });
 
@@ -302,15 +310,15 @@
         function fetchUniversalMessages() {
             adminChatBox.innerHTML = '<p class="status-text">Connecting to cloud network data loop...</p>';
             
-            fetch(SYNC_URL)
-            .then(res => {
-                if (!res.ok) return [];
-                return res.json();
+            fetch(SYNC_URL, {
+                headers: { "X-Master-Key": BIN_KEY }
             })
-            .then(messages => {
-                renderAllMessages(messages);
+            .then(res => res.json())
+            .then(data => {
+                renderAllMessages(data.record || []);
             })
-            .catch(() => {
+            .catch((err) => {
+                console.error("Fetch error:", err);
                 adminChatBox.innerHTML = '<p class="status-text">No active messages recorded on the sync grid yet.</p>';
             });
         }
@@ -326,6 +334,5 @@
             }
         }
     </script>
-
 </body>
 </html>
