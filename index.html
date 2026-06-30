@@ -153,7 +153,7 @@
             padding: 4px 8px;
             border-radius: 4px;
             color: #00e5ff;
-            font-weight: 600;
+            font-weight: 600;https://api.npoint.io/c103846f0251f1ebc051
             text-transform: uppercase;
             margin-right: 6px;
             border: 1px solid rgba(0, 229, 255, 0.2);
@@ -222,7 +222,7 @@
 
     <div id="adminContainer" class="container admin-panel hidden">
         <h3>🔑 Captain & Teacher Inbox</h3>
-        <p style="color: #8892b0; text-align: center; font-size: 14px; margin-top: -10px; margin-bottom: 20px;">Universal Live Engine (Syncs automatically across all separate mobile/desktop devices).</p>
+        <p style="color: #8892b0; text-align: center; font-size: 14px; margin-top: -10px; margin-bottom: 20px;">Universal Live Engine (Syncs automatically across all separate devices).</p>
         <div class="chat-box" id="adminChatBox">
             <p id="noMsgs" class="status-text">No entries loaded yet.</p>
         </div>
@@ -231,8 +231,8 @@
     <script>
         const FORMSPARK_FORM_ID = "G1W26HQC7nYRAYnZXF1ALmYb"; 
         
-        // Brand new dedicated public tunnel matrix endpoint
-        const SYNC_URL = "https://kvdb.io/A9zW7V45bX1y2Z3K4L5M6N/poseidon_school_hq_v5";
+        // --- 🔴 PASTE YOUR NPOINT API LINK BELOW 🔴 ---
+        const NPOINT_URL = "https://api.npoint.io/YOUR_ACTUAL_ID_HERE";
 
         const form = document.getElementById('complaintForm');
         const adminChatBox = document.getElementById('adminChatBox');
@@ -246,30 +246,27 @@
 
             const now = new Date();
             const timestamp = now.toLocaleDateString() + ' @ ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-
             const payload = { grade, category, messageText, timestamp };
 
-            // 1. Send backup trace data to Formspark
+            // Backup stream to Formspark
             fetch(`https://submit-form.com/${FORMSPARK_FORM_ID}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", Accept: "application/json" },
                 body: JSON.stringify({ Grade: grade, Type: category, Message: messageText, SentAt: timestamp }),
             });
 
-            // 2. Fetch array, safely handle data types, and push back up to cloud
-            fetch(SYNC_URL)
-            .then(res => {
-                if (!res.ok) throw new Error();
-                return res.json();
-            })
+            // npoint Read -> Append -> Update Sequence
+            fetch(NPOINT_URL)
+            .then(res => res.json())
             .then(currentData => {
                 let updated = Array.isArray(currentData) ? currentData : [];
                 updated.push(payload);
-                return fetch(SYNC_URL, { method: "POST", body: JSON.stringify(updated) });
-            })
-            .catch(() => {
-                // If endpoint is blank/fresh, seed initial array entry 
-                return fetch(SYNC_URL, { method: "POST", body: JSON.stringify([payload]) });
+
+                return fetch(NPOINT_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(updated)
+                });
             })
             .then(() => {
                 form.reset();
@@ -277,6 +274,10 @@
                 if (!document.getElementById('adminContainer').classList.contains('hidden')) {
                     fetchUniversalMessages();
                 }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Database sync issue.");
             });
         });
 
@@ -286,7 +287,6 @@
                 adminChatBox.innerHTML = '<p class="status-text">No submissions found in cloud server.</p>';
                 return;
             }
-            // Sort to make newest cards appear first
             const reversed = [...arr].reverse();
             reversed.forEach(msg => {
                 const msgDiv = document.createElement('div');
@@ -308,7 +308,7 @@
         function fetchUniversalMessages() {
             adminChatBox.innerHTML = '<p class="status-text">Connecting to cloud network data loop...</p>';
             
-            fetch(SYNC_URL)
+            fetch(NPOINT_URL)
             .then(res => res.json())
             .then(messages => {
                 renderAllMessages(messages);
