@@ -230,8 +230,6 @@
 
     <script>
         const FORMSPARK_FORM_ID = "G1W26HQC7nYRAYnZXF1ALmYb"; 
-        
-        // --- This is your actual working link placed in the correct variable ---
         const NPOINT_URL = "https://api.npoint.io/c103846f0251f1ebc051";
 
         const form = document.getElementById('complaintForm');
@@ -248,12 +246,14 @@
             const timestamp = now.toLocaleDateString() + ' @ ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             const payload = { grade, category, messageText, timestamp };
 
+            // Backup post to Formspark
             fetch(`https://submit-form.com/${FORMSPARK_FORM_ID}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", Accept: "application/json" },
                 body: JSON.stringify({ Grade: grade, Type: category, Message: messageText, SentAt: timestamp }),
             });
 
+            // npoint Read -> Append -> Update Cycle
             fetch(NPOINT_URL)
             .then(res => res.json())
             .then(currentData => {
