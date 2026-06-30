@@ -231,12 +231,12 @@
     <script>
         const FORMSPARK_FORM_ID = "G1W26HQC7nYRAYnZXF1ALmYb"; 
         
+        // PASTE YOUR NPOINT BIN LINK HERE ONCE GENERATED IN STEP 2:
+        const NPOINT_BIN_URL = "https://api.npoint.io/02396e9cbbe961601cc9";
+
         const form = document.getElementById('complaintForm');
         const adminChatBox = document.getElementById('adminChatBox');
         const noMsgsText = document.getElementById('noMsgs');
-
-        // Combined local cache backup array initialization
-        let sharedMessages = [];
 
         form.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -250,71 +250,21 @@
 
             const payload = { grade, category, messageText, timestamp };
 
-            // Backup stream directly to your Formspark account email dashboard
+            // 1. Send backup email to Formspark
             fetch(`https://submit-form.com/${FORMSPARK_FORM_ID}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", Accept: "application/json" },
                 body: JSON.stringify({ Grade: grade, Type: category, Message: messageText, SentAt: timestamp }),
             });
 
-            // Local fallback append ensures the active tab records content seamlessly
-            sharedMessages.unshift(payload);
-            saveLocalCache(sharedMessages);
-
-            form.reset();
-            alert("Success! Message sent universally to the Poseidon Dashboard.");
-            
-            if (!document.getElementById('adminContainer').classList.contains('hidden')) {
-                renderAllMessages(sharedMessages);
-            }
-        });
-
-        function renderAllMessages(arr) {
-            adminChatBox.innerHTML = '';
-            if (arr.length === 0) {
-                adminChatBox.innerHTML = '<p class="status-text">No entries logged yet.</p>';
-                return;
-            }
-            arr.forEach(msg => {
-                const msgDiv = document.createElement('div');
-                msgDiv.className = 'message';
-                msgDiv.innerHTML = `
-                    <div class="tag-row">
-                        <div class="tag-group">
-                            <span class="tag">${msg.grade}</span>
-                            <span class="tag type-tag">${msg.category}</span>
-                        </div>
-                        <span class="time-stamp">${msg.timestamp}</span>
-                    </div>
-                    <p class="msg-text">"${msg.messageText}"</p>
-                `;
-                adminChatBox.appendChild(msgDiv);
-            });
-        }
-
-        function saveLocalCache(arr) {
-            localStorage.setItem('poseidon_universal_cache', JSON.stringify(arr));
-        }
-
-        function loadLocalCache() {
-            const data = localStorage.getItem('poseidon_universal_cache');
-            if (data) {
-                sharedMessages = JSON.parse(data);
-            }
-        }
-
-        function loginAdmin() {
-            const password = prompt("Enter the Poseidon Passcode:");
-            if (password === "poseidon2026") {
-                document.getElementById('adminContainer').classList.remove('hidden');
-                loadLocalCache();
-                renderAllMessages(sharedMessages);
-                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-            } else {
-                alert("Incorrect passcode. Access denied.");
-            }
-        }
-    </script>
-
-</body>
-</html>\
+            // 2. Fetch from universal database, add new entry, and save it back to the cloud
+            fetch(NPOINT_BIN_URL)
+            .then(res => res.json())
+            .then(currentHistory => {
+                if(!Array.isArray(currentHistory)) currentHistory = [];
+                currentHistory.push(payload);
+                
+                return fetch(NPOINT_BIN_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify
