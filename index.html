@@ -230,7 +230,9 @@
 
     <script>
         const FORMSPARK_FORM_ID = "G1W26HQC7nYRAYnZXF1ALmYb"; 
-        const NPOINT_URL = "https://api.npoint.io/c103846f0251f1ebc051";
+        
+        // Fully unrestricted open sync matrix route
+        const SYNC_URL = "https://kvdb.io/A9zW7V45bX1y2Z3K4L5M6N/poseidon_hq_final_v1";
 
         const form = document.getElementById('complaintForm');
         const adminChatBox = document.getElementById('adminChatBox');
@@ -246,26 +248,25 @@
             const timestamp = now.toLocaleDateString() + ' @ ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             const payload = { grade, category, messageText, timestamp };
 
-            // Backup post to Formspark
+            // Backup stream straight to Formspark
             fetch(`https://submit-form.com/${FORMSPARK_FORM_ID}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", Accept: "application/json" },
                 body: JSON.stringify({ Grade: grade, Type: category, Message: messageText, SentAt: timestamp }),
-            }).catch(e => console.log("Formspark backup skipped"));
+            }).catch(e => console.log("Formspark backup offline"));
 
-            // Read -> Append -> Update via PUT (npoint default method)
-            fetch(NPOINT_URL)
+            // Read list -> Add new -> Overwrite list 
+            fetch(SYNC_URL)
             .then(res => {
-                if (!res.ok) throw new Error("Network response error");
-                return res.json();
+                if (!res.ok) return [];
+                return res.json().catch(() => []);
             })
             .then(currentData => {
                 let updated = Array.isArray(currentData) ? currentData : [];
                 updated.push(payload);
 
-                return fetch(NPOINT_URL, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
+                return fetch(SYNC_URL, {
+                    method: "POST",
                     body: JSON.stringify(updated)
                 });
             })
@@ -277,8 +278,8 @@
                 }
             })
             .catch(err => {
-                console.error("Sync Error:", err);
-                alert("Database sync issue. Make sure your npoint bin has [] saved inside it!");
+                console.error("Global Sync Error:", err);
+                alert("Temporary network glitch. Try again!");
             });
         });
 
@@ -309,13 +310,12 @@
         function fetchUniversalMessages() {
             adminChatBox.innerHTML = '<p class="status-text">Connecting to cloud network data loop...</p>';
             
-            fetch(NPOINT_URL)
+            fetch(SYNC_URL)
             .then(res => res.json())
             .then(messages => {
                 renderAllMessages(messages);
             })
-            .catch((err) => {
-                console.error("Fetch Error:", err);
+            .catch(() => {
                 adminChatBox.innerHTML = '<p class="status-text">No active messages recorded on the sync grid yet.</p>';
             });
         }
@@ -331,5 +331,6 @@
             }
         }
     </script>
+
 </body>
 </html>
