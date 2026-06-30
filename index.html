@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Poseidon House Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -222,23 +223,24 @@
 
     <div id="adminContainer" class="container admin-panel hidden">
         <h3>🔑 Captain & Teacher Inbox</h3>
-        <p style="color: #8892b0; text-align: center; font-size: 14px; margin-top: -10px; margin-bottom: 20px;">Universal Live Database (Syncs automatically across all devices).</p>
+        <p style="color: #8892b0; text-align: center; font-size: 14px; margin-top: -10px; margin-bottom: 20px;">Universal Live Engine (Syncs across completely separate devices via Cloud).</p>
         <div class="chat-box" id="adminChatBox">
-            <p id="noMsgs" class="status-text">Loading incoming entries from network...</p>
+            <p id="noMsgs" class="status-text">Select view to open message history sync window...</p>
         </div>
     </div>
 
     <script>
         const FORMSPARK_FORM_ID = "G1W26HQC7nYRAYnZXF1ALmYb"; 
-        
-        // PASTE YOUR NPOINT BIN LINK HERE ONCE GENERATED IN STEP 2:
-        const NPOINT_BIN_URL = "https://api.npoint.io/02396e9cbbe961601cc9";
+
+        // Public Supabase Connection Cluster Setup 
+        const SUPABASE_URL = "https://wbtfbeomcluzvshdfshj.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndidGZiZW9tY2x1enZzaGRmc2hqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTU5MTMxMjIsImV4cCI6MjAzMTQ4OTEyMn0.eS12bXN2Qlpnd0c2Q1FzLVpWbHh2ZURhZ0wzY0tfX3g1WklvUkxGZTR3";
+        const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         const form = document.getElementById('complaintForm');
         const adminChatBox = document.getElementById('adminChatBox');
-        const noMsgsText = document.getElementById('noMsgs');
 
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const grade = document.getElementById('grade').value;
@@ -246,25 +248,4 @@
             const messageText = document.getElementById('message').value;
 
             const now = new Date();
-            const timestamp = now.toLocaleDateString() + ' @ ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-
-            const payload = { grade, category, messageText, timestamp };
-
-            // 1. Send backup email to Formspark
-            fetch(`https://submit-form.com/${FORMSPARK_FORM_ID}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", Accept: "application/json" },
-                body: JSON.stringify({ Grade: grade, Type: category, Message: messageText, SentAt: timestamp }),
-            });
-
-            // 2. Fetch from universal database, add new entry, and save it back to the cloud
-            fetch(NPOINT_BIN_URL)
-            .then(res => res.json())
-            .then(currentHistory => {
-                if(!Array.isArray(currentHistory)) currentHistory = [];
-                currentHistory.push(payload);
-                
-                return fetch(NPOINT_BIN_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify
+            const timestamp = now.toLocaleDateString() + ' @ ' + now.toLocaleTimeString([], {hour: '
