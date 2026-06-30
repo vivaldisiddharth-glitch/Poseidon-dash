@@ -43,7 +43,7 @@
             font-size: 28px;
             text-shadow: 0 0 15px rgba(0, 229, 255, 0.6);
         }
-        h2, h3 {
+        h3 {
             text-align: center;
             color: #00e5ff;
             text-transform: uppercase;
@@ -64,7 +64,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-        input, select, textarea {
+        select, textarea {
             width: 100%;
             padding: 12px 15px;
             margin-bottom: 10px;
@@ -76,7 +76,7 @@
             font-size: 15px;
             transition: all 0.2s ease;
         }
-        input:focus, select:focus, textarea:focus {
+        select:focus, textarea:focus {
             outline: none;
             border-color: #00e5ff;
             box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
@@ -136,10 +136,16 @@
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
-            to { opacity: opacity: 1; transform: translateY(0); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .tag-row {
             margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .tag-group {
+            display: flex;
         }
         .tag {
             font-size: 11px;
@@ -156,6 +162,10 @@
             background: rgba(100, 255, 218, 0.1);
             color: #64ffda;
             border-color: rgba(100, 255, 218, 0.2);
+        }
+        .time-stamp {
+            font-size: 11px;
+            color: #8892b0;
         }
         .hidden {
             display: none;
@@ -207,105 +217,6 @@
 
     <div id="adminContainer" class="container admin-panel hidden">
         <h3 style="color: #ffb300; text-shadow: 0 0 10px rgba(255, 179, 0, 0.4);">🔑 Captain & Teacher Inbox</h3>
-        <p style="color: #8892b0; text-align: center; font-size: 14px; margin-top: -10px; margin-bottom: 20px;">Saved History Dashboard (All messages remain saved on this browser).</p>
+        <p style="color: #8892b0; text-align: center; font-size: 14px; margin-top: -10px; margin-bottom: 20px;">Saved History Dashboard (All messages remain saved with timestamps).</p>
         <div class="chat-box" id="adminChatBox">
-            <p id="noMsgs" style="text-align: center; color: #8892b0;">No messages received yet.</p>
-        </div>
-        <button onclick="clearMessages()" style="background: transparent; border: 1px solid #ef4444; color: #ef4444; font-size: 12px; padding: 6px; width: auto; margin: 15px auto 0 auto; display: block; box-shadow: none;">Clear Inbox Data</button>
-    </div>
-
-    <script>
-        // Paste your exact form ID string from Formspark inside the quotes below:
-        const FORMSPARK_FORM_ID = "G1W26HQC7nYRAYnZXF1ALmYb"; 
-
-        const form = document.getElementById('complaintForm');
-        const adminChatBox = document.getElementById('adminChatBox');
-        const noMsgsText = document.getElementById('noMsgs');
-
-        // Load saved messages from LocalStorage when the page loads
-        document.addEventListener("DOMContentLoaded", loadMessages);
-
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const grade = document.getElementById('grade').value;
-            const category = document.getElementById('category').value;
-            const messageText = document.getElementById('message').value;
-
-            // 1. Send data in the background to Formspark so it emails you
-            fetch(`https://submit-form.com/${FORMSPARK_FORM_ID}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Accept: "application/json",
-                },
-                body: JSON.stringify({
-                    Grade: grade,
-                    Type: category,
-                    Message: messageText,
-                }),
-            })
-            .then(() => {
-                // Save locally so it doesn't vanish on refresh
-                const newMsg = { grade, category, messageText };
-                saveMessageToLocalStorage(newMsg);
-                
-                // Add to visual view immediately
-                renderMessage(newMsg);
-
-                form.reset();
-                alert("Success! Sent directly to the Poseidon Dashboard.");
-            })
-            .catch((error) => {
-                console.error("Error sending message:", error);
-                alert("Network error. Please try again.");
-            });
-        });
-
-        function renderMessage(msg) {
-            if (noMsgsText) noMsgsText.style.display = 'none';
-
-            const msgDiv = document.createElement('div');
-            msgDiv.className = 'message';
-            msgDiv.innerHTML = `
-                <div class="tag-row">
-                    <span class="tag">${msg.grade}</span>
-                    <span class="tag type-tag">${msg.category}</span>
-                </div>
-                <p class="msg-text">"${msg.messageText}"</p>
-            `;
-            adminChatBox.insertBefore(msgDiv, adminChatBox.firstChild);
-        }
-
-        function saveMessageToLocalStorage(msg) {
-            let messages = localStorage.getItem('poseidon_messages') ? JSON.parse(localStorage.getItem('poseidon_messages')) : [];
-            messages.push(msg);
-            localStorage.setItem('poseidon_messages', JSON.stringify(messages));
-        }
-
-        function loadMessages() {
-            let messages = localStorage.getItem('poseidon_messages') ? JSON.parse(localStorage.getItem('poseidon_messages')) : [];
-            if (messages.length > 0 && noMsgsText) noMsgsText.style.display = 'none';
-            messages.forEach(msg => renderMessage(msg));
-        }
-
-        function clearMessages() {
-            if (confirm("Are you sure you want to wipe all stored messages from this browser session?")) {
-                localStorage.removeItem('poseidon_messages');
-                location.reload();
-            }
-        }
-
-        function loginAdmin() {
-            const password = prompt("Enter the Poseidon Passcode:");
-            if (password === "poseidon2026") {
-                document.getElementById('adminContainer').classList.remove('hidden');
-                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-            } else {
-                alert("Incorrect passcode. Access denied.");
-            }
-        }
-    </script>
-
-</body>
-</html>
+            <p id="noMsgs" style="text-align: center; color: #8
