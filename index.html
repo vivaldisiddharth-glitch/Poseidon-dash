@@ -239,7 +239,6 @@
             const category = document.getElementById('category').value;
             const messageText = document.getElementById('message').value;
 
-            // Generate exact current date and time format
             const now = new Date();
             const timestamp = now.toLocaleDateString() + ' @ ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
@@ -297,7 +296,6 @@
         function loadMessages() {
             let messages = localStorage.getItem('poseidon_messages') ? JSON.parse(localStorage.getItem('poseidon_messages')) : [];
             if (messages.length > 0 && noMsgsText) noMsgsText.style.display = 'none';
-            // Reverse loop so chronological tracking renders correctly on load
             messages.forEach(msg => renderMessage(msg));
         }
 
