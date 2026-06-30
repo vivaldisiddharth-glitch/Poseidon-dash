@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poseidon House Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+        h1, h2, h3 {
+            text-align: center;
+            color: #4fc3f7;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        select option {
+            background: #203a43;
+            color: #fff;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #00e5ff;
+            border: none;
+            color: #0f2027;
+            font-weight: bold;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #00b8d4;
+            box-shadow: 0 0 15px #00e5ff;
+        }
+        .admin-btn {
+            background: #ffb300;
+            margin-top: 10px;
+        }
+        .admin-btn:hover {
+            background: #ffa000;
+            box-shadow: 0 0 15px #ffb300;
+        }
+        .chat-box {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .message {
+            border-left: 4px solid #00e5ff;
+            padding-left: 10px;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 0 5px 5px 0;
+        }
+        .tag {
+            font-size: 12px;
+            background: #2c5364;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #4fc3f7;
+            margin-right: 5px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        .hidden {
+            display: none;
+        }
+        .admin-panel {
+            border: 2px solid #ffb300;
+            background: rgba(255, 179, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🔱 Poseidon Dashboard 🔱</h1>
+        <p style="text-align: center;">Submit complaints or ideas straight to the Council & Teachers.</p>
+        
+        <form id="complaintForm">
+            <label for="grade">Your Grade:</label>
+            <select id="grade" required>
+                <option value="6th Grade">6th Grade</option>
+                <option value="7th Grade">7th Grade</option>
+                <option value="8th Grade">8th Grade</option>
+                <option value="9th Grade">9th Grade</option>
+                <option value="10th Grade">10th Grade</option>
+                <option value="11th Grade">11th Grade</option>
+                <option value="12th Grade">12th Grade</option>
+            </select>
+
+            <label for="category">Type:</label>
+            <select id="category" required>
+                <option value="Complaint">Complaint</option>
+                <option value="Request Help">Request Help</option>
+                <option value="Event Idea">Event Idea</option>
+            </select>
+
+            <label for="message">Your Message:</label>
+            <textarea id="message" rows="3" placeholder="Type here..." required></textarea>
+
+            <button type="submit">Submit to Dashboard</button>
+        </form>
+        
+        <button class="button admin-btn" onclick="loginAdmin()">🔒 Council & Teacher View</button>
+    </div>
+
+    <div id="adminContainer" class="container admin-panel hidden">
+        <h3>🔑 Captain & Teacher Inbox</h3>
+        <p style="color: #ffb300; text-align: center; font-size: 14px; margin-top: -10px;">Showing all submitted messages on this session.</p>
+        <div class="chat-box" id="adminChatBox">
+            <p id="noMsgs" style="text-align: center; color: #aaa;">No messages loaded in this view yet.</p>
+        </div>
+    </div>
+
+    <script>
+        // Paste your exact form ID string from Formspark inside the quotes below:
+        const FORMSPARK_FORM_ID = "G1W26HQC7nYRAYnZXF1ALmYb"; 
+
+        const form = document.getElementById('complaintForm');
+        const adminChatBox = document.getElementById('adminChatBox');
+        const noMsgsText = document.getElementById('noMsgs');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const grade = document.getElementById('grade').value;
+            const category = document.getElementById('category').value;
+            const messageText = document.getElementById('message').value;
+
+            // 1. Send data in the background to Formspark so it emails you
+            fetch(`https://submit-form.com/${FORMSPARK_FORM_ID}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+                body: JSON.stringify({
+                    Grade: grade,
+                    Type: category,
+                    Message: messageText,
+                }),
+            })
+            .then(() => {
+                // 2. Add it live to the dashboard inbox on the screen straight away
+                if (noMsgsText) noMsgsText.style.display = 'none';
+
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'message';
+                msgDiv.innerHTML = `
+                    <strong>New Submission:</strong> <br>
+                    <span class="tag">${grade}</span><span class="tag" style="color:#ffb300;">${category}</span>
+                    <p style="margin-top: 8px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 4px; border-left: 2px solid #ffb300;">"${messageText}"</p>
+                `;
+                adminChatBox.insertBefore(msgDiv, adminChatBox.firstChild);
+
+                form.reset();
+                alert("Success! Your entry has been sent to Formspark and added directly to the Poseidon Dashboard.");
+            })
+            .catch((error) => {
+                console.error("Error sending message:", error);
+                alert("Something went wrong. Please check your network connection.");
+            });
+        });
+
+        function loginAdmin() {
+            const password = prompt("Enter the Poseidon Passcode:");
+            if (password === "poseidon2026") {
+                document.getElementById('adminContainer').classList.remove('hidden');
+                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            } else {
+                alert("Incorrect passcode. Access denied.");
+            }
+        }
+    </script>
+
+</body>
+</html>
